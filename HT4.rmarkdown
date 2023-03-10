@@ -1,0 +1,62 @@
+```{r instalaciones_paquetes, echo=FALSE}
+
+```
+
+```{r cargar_librerias, echo=FALSE, message=FALSE, warning=FALSE}
+    library(rpart)
+    library(caret)
+    library(tree)
+    library(rpart.plot)
+    library(randomForest)
+    library(dplyr)
+    library(magrittr)
+```
+
+
+# 1. Lectura Dataset 
+
+```{r recoleccion_de_data}
+    datos <- read.csv("train.csv")
+    
+    Cuantitativas <- c("SalePrice", "LotFrontage", "LotArea", "OverallQual", "OverallCond", "MasVnrArea", "BsmtFinSF1", "BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF", "X2ndFlrSF", "LowQualFinSF", "GrLivArea", "BsmtFullBath", "BsmtHalfBath", "FullBath", "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "TotRmsAbvGrd", "Fireplaces", "GarageCars", "GarageArea", "WoodDeckSF", "OpenPorchSF", "EnclosedPorch", "X3SsnPorch", "ScreenPorch", "PoolArea", "MiscVal")
+    df_cuantitativas <- datos[Cuantitativas]
+```
+
+```{r normalizar_datos}
+    datos$LotFrontage[is.na(datos$LotFrontage)] <- median(datos$LotFrontage, na.rm = TRUE)
+    datos$MasVnrArea[is.na(datos$MasVnrArea)] <- median(datos$MasVnrArea, na.rm = TRUE)
+    datos <- datos[ , !(names(datos) %in% c("Alley", "PoolQC", "Fence", "MiscFeature","FireplaceQu"))]
+
+    df_cuantitativas <- datos[Cuantitativas] #Tras los cambios de Na´s
+    df_norm <- mutate_if(datos, is.numeric, scale)
+    df_cualitativas <- df_norm[ , !(names(df_norm) %in% Cuantitativas)]
+
+    for (i in 1:ncol(df_cualitativas)) {
+        df_norm[,i] <- ifelse(is.na(df_norm[,i]), "Desconocido", df_norm[,i])
+    }
+    
+    df_norm <- df_norm %>% mutate_at(colnames(df_cualitativas), function(x) as.factor(x))
+
+```
+
+
+
+# 1.1 Dividir el dataset en train y test
+
+```{r Split_data }
+    set.seed(123)
+    porcentaje<-0.7
+    corte <- sample(nrow(df_norm),nrow(df_norm)*porcentaje)
+    train<-df_norm[corte,]
+    test<-df_norm[-corte,]
+```
+
+
+# 1.2 Elaborar arbol de regresion
+
+```{r crear_modelo}
+    modelo_arbol <- rpart(SalePrice ~., data = train, method = "class")
+    #box.palette = "Blues"
+    #rpart.plot(modelo_arbol)
+```
+
