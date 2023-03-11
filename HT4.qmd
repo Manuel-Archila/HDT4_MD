@@ -1,21 +1,27 @@
 ```{r instalaciones_paquetes, echo=FALSE}
 
+
 ```
 
 ```{r cargar_librerias, echo=FALSE, message=FALSE, warning=FALSE}
     library(rpart)
     library(caret)
     library(tree)
+    library(mlr)
+    library(rpart)
     library(rpart.plot)
+    library(Metrics)
     library(randomForest)
     library(dplyr)
     library(magrittr)
+    library(ggplot2)
 ```
 
 # 1. Lectura Dataset 
 ```{r recoleccion_de_data}
     datos <- read.csv("train.csv")
-    
+    datos <- datos[ , !(names(datos) %in% c("Id","YrSold","MoSold","GarageYrBlt","MSSubClass","YearBuilt"))]
+
     Cuantitativas <- c("SalePrice", "LotFrontage", "LotArea", "OverallQual", "OverallCond", "MasVnrArea", "BsmtFinSF1", "BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF", "X2ndFlrSF", "LowQualFinSF", "GrLivArea", "BsmtFullBath", "BsmtHalfBath", "FullBath", "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "TotRmsAbvGrd", "Fireplaces", "GarageCars", "GarageArea", "WoodDeckSF", "OpenPorchSF", "EnclosedPorch", "X3SsnPorch", "ScreenPorch", "PoolArea", "MiscVal")
     df_cuantitativas <- datos[Cuantitativas]
 ```
@@ -30,7 +36,7 @@
     df_cualitativas <- df_norm[ , !(names(df_norm) %in% Cuantitativas)]
 
     for (i in 1:ncol(df_cualitativas)) {
-        df_norm[,i] <- ifelse(is.na(df_norm[,i]), "Desconocido", df_norm[,i])
+         df_norm[,i] <- ifelse(is.na(df_norm[,i]), "Desconocido", df_norm[,i])
     }
     
     df_norm <- df_norm %>% mutate_at(colnames(df_cualitativas), function(x) as.factor(x))
@@ -39,9 +45,9 @@
 
 
 # 1.1 Dividir el dataset en train y test
-```{r Split_data }
+```{r split_data }
     set.seed(123)
-    porcentaje<-0.05
+    porcentaje<-0.7
     corte <- sample(nrow(df_norm),nrow(df_norm)*porcentaje)
     train<-df_norm[corte,]
     test<-df_norm[-corte,]
@@ -49,7 +55,96 @@
 
 # 1.2 Elaborar arbol de regresion
 ```{r crear_modelo}
-    modelo_arbol <- rpart(SalePrice ~., data = train, method = "class")
-    #box.palette = "Blues"
-    #rpart.plot(modelo_arbol)
+    modelo_arbol <- rpart(SalePrice ~., data = train)
+    rpart.plot(modelo_arbol)
+```
+
+# 1.3 Predicciones
+```{r predicciones , warning=FALSE, message=FALSE}
+    predicciones <- predict(modelo_arbol, newdata = test)
+    SSE <- sum((predicciones - test$SalePrice) ^ 2)
+    TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
+    R2 <- 1 - SSE / TSS
+    R2
+    
+```
+
+# 1.4 
+```{r multiple_trees}
+    #  arboles_params <- makeRegrTask(
+    #      data = train,
+    #      target = "SalePrice"
+    #  )
+
+    # param_grid <- makeParamSet(
+    #      makeDiscreteParam("madeph", values= 1:30)
+    # )
+
+    # control_grid <- makeTuneControlGrid()
+    # resample <- makeReampleDesc("CV", iters = 3L)
+    
+    # measure <- acc
+
+    # set.seed(123)
+    # dt_tuneparam <- tuneParams(learner='classif.rpart', 
+    #     task=arboles_params, 
+    #     resampling = resample,
+    #     measures = measure,
+    #     par.set=param_grid, 
+    #     control=control_grid, 
+    #     show.info = TRUE)
+
+    # result_hyperparam <- generateHyperParsEffectData(dt_tuneparam, partial.dep = TRUE)
+
+    # ggplot(
+    #     data = result_hyperparam$data,
+    #     aes(x = maxdepth, y=acc.test.mean)
+    #      ) + geom_line(color = 'darkblue')
+    
+    # best_parameters <- setHyperPars(
+    #     makeLearner("classif.rpart"), 
+    #     par.vals = dt_tuneparam$x
+    # )
+    
+    # best_model <- train(best_parameters, dt_task)
+
+    # modelo_arbol_test <- makeRegrTask(
+    #     data = test,
+    #     target = "SalePrice"
+    # )
+
+    # results <- predict(best_model, task = modelo_arbol_test)$data
+    # accuracy(results$truth, results$response)
+    
+    
+```
+# 1.5
+```{r}
+    
+    
+```
+# 1.6
+```{r clasificacion}
+    salePrices <- df_norm$SalePrice
+    q1 <- quantile(df_norm$SalePrice, 0.33)
+    q2 <- quantile(df_norm$SalePrice, 0.66)
+    df_norm$Classification <- sapply(df_norm$SalePrice, function(x) ifelse(x < q1, "Economicas", ifelse(x < q2, "Intermedias", "Caras")))
+    df_norm$Classification <- factor(df_norm$Classification)
+```
+
+# 1.7
+```{r new_model}
+    df_norm_w_SP <- df_norm[ , !(names(df_norm) %in% c("SalePrice"))]
+    df_norm_w_SP <- df_norm_w_SP[ ,c("Classification","Neighborhood","OverallQual","LotFrontage","MSZoning") ]
+
+    corte <- sample(nrow(df_norm_w_SP),nrow(df_norm_w_SP)*porcentaje)
+    train2<-df_norm_w_SP[corte,]
+    test2<-df_norm_w_SP[-corte,]
+    modelo4<- rpart(Classification~.,train2[],method = "class",maxdepth=3)
+    rpart.plot(modelo4)
+
+    ypred <- predict(modelo4, newdata = test2)
+    ypred<-apply(ypred, 1, function(x) colnames(ypred)[which.max(x)])
+    ypred <- factor(ypred)
+    confusionMatrix(ypred, test2$Classification)
 ```

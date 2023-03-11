@@ -112,82 +112,181 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(rpart)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(caret)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: ggplot2</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: lattice</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(tree)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(rpart.plot)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(randomForest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>randomForest 4.7-1.1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Type rfNews() to see new features/changes/bug fixes.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'randomForest'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:ggplot2':
 
-    margin</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:randomForest':
-
-    combine</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
 </div>
 <section id="lectura-dataset" class="level1">
 <h1>1. Lectura Dataset</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>    datos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"train.csv"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    Cuantitativas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SalePrice"</span>, <span class="st">"LotFrontage"</span>, <span class="st">"LotArea"</span>, <span class="st">"OverallQual"</span>, <span class="st">"OverallCond"</span>, <span class="st">"MasVnrArea"</span>, <span class="st">"BsmtFinSF1"</span>, <span class="st">"BsmtFinSF2"</span>, <span class="st">"BsmtUnfSF"</span>, <span class="st">"TotalBsmtSF"</span>, <span class="st">"X1stFlrSF"</span>, <span class="st">"X2ndFlrSF"</span>, <span class="st">"LowQualFinSF"</span>, <span class="st">"GrLivArea"</span>, <span class="st">"BsmtFullBath"</span>, <span class="st">"BsmtHalfBath"</span>, <span class="st">"FullBath"</span>, <span class="st">"HalfBath"</span>, <span class="st">"BedroomAbvGr"</span>, <span class="st">"KitchenAbvGr"</span>, <span class="st">"TotRmsAbvGrd"</span>, <span class="st">"Fireplaces"</span>, <span class="st">"GarageCars"</span>, <span class="st">"GarageArea"</span>, <span class="st">"WoodDeckSF"</span>, <span class="st">"OpenPorchSF"</span>, <span class="st">"EnclosedPorch"</span>, <span class="st">"X3SsnPorch"</span>, <span class="st">"ScreenPorch"</span>, <span class="st">"PoolArea"</span>, <span class="st">"MiscVal"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    df_cuantitativas <span class="ot">&lt;-</span> datos[Cuantitativas]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    datos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"train.csv"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    datos <span class="ot">&lt;-</span> datos[ , <span class="sc">!</span>(<span class="fu">names</span>(datos) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Id"</span>,<span class="st">"YrSold"</span>,<span class="st">"MoSold"</span>,<span class="st">"GarageYrBlt"</span>,<span class="st">"MSSubClass"</span>,<span class="st">"YearBuilt"</span>))]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    Cuantitativas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SalePrice"</span>, <span class="st">"LotFrontage"</span>, <span class="st">"LotArea"</span>, <span class="st">"OverallQual"</span>, <span class="st">"OverallCond"</span>, <span class="st">"MasVnrArea"</span>, <span class="st">"BsmtFinSF1"</span>, <span class="st">"BsmtFinSF2"</span>, <span class="st">"BsmtUnfSF"</span>, <span class="st">"TotalBsmtSF"</span>, <span class="st">"X1stFlrSF"</span>, <span class="st">"X2ndFlrSF"</span>, <span class="st">"LowQualFinSF"</span>, <span class="st">"GrLivArea"</span>, <span class="st">"BsmtFullBath"</span>, <span class="st">"BsmtHalfBath"</span>, <span class="st">"FullBath"</span>, <span class="st">"HalfBath"</span>, <span class="st">"BedroomAbvGr"</span>, <span class="st">"KitchenAbvGr"</span>, <span class="st">"TotRmsAbvGrd"</span>, <span class="st">"Fireplaces"</span>, <span class="st">"GarageCars"</span>, <span class="st">"GarageArea"</span>, <span class="st">"WoodDeckSF"</span>, <span class="st">"OpenPorchSF"</span>, <span class="st">"EnclosedPorch"</span>, <span class="st">"X3SsnPorch"</span>, <span class="st">"ScreenPorch"</span>, <span class="st">"PoolArea"</span>, <span class="st">"MiscVal"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    df_cuantitativas <span class="ot">&lt;-</span> datos[Cuantitativas]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>    datos<span class="sc">$</span>LotFrontage[<span class="fu">is.na</span>(datos<span class="sc">$</span>LotFrontage)] <span class="ot">&lt;-</span> <span class="fu">mean</span>(datos<span class="sc">$</span>LotFrontage, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    datos<span class="sc">$</span>MasVnrArea[<span class="fu">is.na</span>(datos<span class="sc">$</span>MasVnrArea)] <span class="ot">&lt;-</span> <span class="fu">mean</span>(datos<span class="sc">$</span>MasVnrArea, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    datos <span class="ot">&lt;-</span> datos[ , <span class="sc">!</span>(<span class="fu">names</span>(datos) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Alley"</span>, <span class="st">"PoolQC"</span>, <span class="st">"Fence"</span>, <span class="st">"MiscFeature"</span>,<span class="st">"FireplaceQu"</span>))]</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    df_cuantitativas <span class="ot">&lt;-</span> datos[Cuantitativas] <span class="co">#Tras los cambios de Na´s</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    numericas_norm <span class="ot">&lt;-</span> <span class="fu">mutate_if</span>(df_cuantitativas, is.numeric, scale)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    df_cualitativas <span class="ot">&lt;-</span> datos[ , <span class="sc">!</span>(<span class="fu">names</span>(datos) <span class="sc">%in%</span> Cuantitativas)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    datos<span class="sc">$</span>LotFrontage[<span class="fu">is.na</span>(datos<span class="sc">$</span>LotFrontage)] <span class="ot">&lt;-</span> <span class="fu">median</span>(datos<span class="sc">$</span>LotFrontage, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    datos<span class="sc">$</span>MasVnrArea[<span class="fu">is.na</span>(datos<span class="sc">$</span>MasVnrArea)] <span class="ot">&lt;-</span> <span class="fu">median</span>(datos<span class="sc">$</span>MasVnrArea, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    datos <span class="ot">&lt;-</span> datos[ , <span class="sc">!</span>(<span class="fu">names</span>(datos) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Alley"</span>, <span class="st">"PoolQC"</span>, <span class="st">"Fence"</span>, <span class="st">"MiscFeature"</span>,<span class="st">"FireplaceQu"</span>))]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    df_cuantitativas <span class="ot">&lt;-</span> datos[Cuantitativas] <span class="co">#Tras los cambios de Na´s</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    df_norm <span class="ot">&lt;-</span> <span class="fu">mutate_if</span>(datos, is.numeric, scale)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    df_cualitativas <span class="ot">&lt;-</span> df_norm[ , <span class="sc">!</span>(<span class="fu">names</span>(df_norm) <span class="sc">%in%</span> Cuantitativas)]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(df_cualitativas)) {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>         df_norm[,i] <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(df_norm[,i]), <span class="st">"Desconocido"</span>, df_norm[,i])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    df_norm <span class="ot">&lt;-</span> df_norm <span class="sc">%&gt;%</span> <span class="fu">mutate_at</span>(<span class="fu">colnames</span>(df_cualitativas), <span class="cf">function</span>(x) <span class="fu">as.factor</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="dividir-el-dataset-en-train-y-test" class="level1">
 <h1>1.1 Dividir el dataset en train y test</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    porcentaje<span class="ot">&lt;-</span><span class="fl">0.7</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    corte <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df_cuantitativas),<span class="fu">nrow</span>(df_cuantitativas)<span class="sc">*</span>porcentaje)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    train<span class="ot">&lt;-</span>datos[corte,]</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    test<span class="ot">&lt;-</span>datos[<span class="sc">-</span>corte,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    porcentaje<span class="ot">&lt;-</span><span class="fl">0.7</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    corte <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df_norm),<span class="fu">nrow</span>(df_norm)<span class="sc">*</span>porcentaje)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    train<span class="ot">&lt;-</span>df_norm[corte,]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    test<span class="ot">&lt;-</span>df_norm[<span class="sc">-</span>corte,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="elaborar-arbol-de-regresion" class="level1">
+<h1>1.2 Elaborar arbol de regresion</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>    modelo_arbol <span class="ot">&lt;-</span> <span class="fu">rpart</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train, <span class="at">method =</span> <span class="st">"class"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    modelo_arbol <span class="ot">&lt;-</span> <span class="fu">rpart</span>(SalePrice <span class="sc">~</span>., <span class="at">data =</span> train)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rpart.plot</span>(modelo_arbol)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="HT4_files/figure-html/crear_modelo-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="predicciones" class="level1">
+<h1>1.3 Predicciones</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    predicciones <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_arbol, <span class="at">newdata =</span> test)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>((predicciones <span class="sc">-</span> test<span class="sc">$</span>SalePrice) <span class="sc">^</span> <span class="dv">2</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    TSS <span class="ot">&lt;-</span> <span class="fu">sum</span>((test<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test<span class="sc">$</span>SalePrice)) <span class="sc">^</span> <span class="dv">2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    R2 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> SSE <span class="sc">/</span> TSS</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    R2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.65251</code></pre>
+</div>
+</div>
+</section>
+<section id="section" class="level1">
+<h1>1.4</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">#  arboles_params &lt;- makeRegrTask(</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">#      data = train,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">#      target = "SalePrice"</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">#  )</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># param_grid &lt;- makeParamSet(</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#      makeDiscreteParam("madeph", values= 1:30)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># )</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># control_grid &lt;- makeTuneControlGrid()</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># resample &lt;- makeReampleDesc("CV", iters = 3L)</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># measure &lt;- acc</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># set.seed(123)</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># dt_tuneparam &lt;- tuneParams(learner='classif.rpart', </span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     task=arboles_params, </span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     resampling = resample,</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     measures = measure,</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     par.set=param_grid, </span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     control=control_grid, </span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     show.info = TRUE)</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># result_hyperparam &lt;- generateHyperParsEffectData(dt_tuneparam, partial.dep = TRUE)</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ggplot(</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     data = result_hyperparam$data,</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     aes(x = maxdepth, y=acc.test.mean)</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#      ) + geom_line(color = 'darkblue')</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># best_parameters &lt;- setHyperPars(</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     makeLearner("classif.rpart"), </span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     par.vals = dt_tuneparam$x</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># )</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># best_model &lt;- train(best_parameters, dt_task)</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># modelo_arbol_test &lt;- makeRegrTask(</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     data = test,</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     target = "SalePrice"</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># )</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># results &lt;- predict(best_model, task = modelo_arbol_test)$data</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># accuracy(results$truth, results$response)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section-1" class="level1">
+<h1>1.5</h1>
+<div class="cell">
+
+</div>
+</section>
+<section id="section-2" class="level1">
+<h1>1.6</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    salePrices <span class="ot">&lt;-</span> df_norm<span class="sc">$</span>SalePrice</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    q1 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(df_norm<span class="sc">$</span>SalePrice, <span class="fl">0.33</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    q2 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(df_norm<span class="sc">$</span>SalePrice, <span class="fl">0.66</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    df_norm<span class="sc">$</span>Classification <span class="ot">&lt;-</span> <span class="fu">sapply</span>(df_norm<span class="sc">$</span>SalePrice, <span class="cf">function</span>(x) <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> q1, <span class="st">"Economicas"</span>, <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> q2, <span class="st">"Intermedias"</span>, <span class="st">"Caras"</span>)))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    df_norm<span class="sc">$</span>Classification <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_norm<span class="sc">$</span>Classification)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section-3" class="level1">
+<h1>1.7</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    df_norm_w_SP <span class="ot">&lt;-</span> df_norm[ , <span class="sc">!</span>(<span class="fu">names</span>(df_norm) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"SalePrice"</span>))]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    df_norm_w_SP <span class="ot">&lt;-</span> df_norm_w_SP[ ,<span class="fu">c</span>(<span class="st">"Classification"</span>,<span class="st">"Neighborhood"</span>,<span class="st">"OverallQual"</span>,<span class="st">"LotFrontage"</span>,<span class="st">"MSZoning"</span>) ]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    corte <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df_norm_w_SP),<span class="fu">nrow</span>(df_norm_w_SP)<span class="sc">*</span>porcentaje)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    train2<span class="ot">&lt;-</span>df_norm_w_SP[corte,]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    test2<span class="ot">&lt;-</span>df_norm_w_SP[<span class="sc">-</span>corte,]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    modelo4<span class="ot">&lt;-</span> <span class="fu">rpart</span>(Classification<span class="sc">~</span>.,train2[],<span class="at">method =</span> <span class="st">"class"</span>,<span class="at">maxdepth=</span><span class="dv">3</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rpart.plot</span>(modelo4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="HT4_files/figure-html/new_model-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    ypred <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo4, <span class="at">newdata =</span> test2)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    ypred<span class="ot">&lt;-</span><span class="fu">apply</span>(ypred, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">colnames</span>(ypred)[<span class="fu">which.max</span>(x)])</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    ypred <span class="ot">&lt;-</span> <span class="fu">factor</span>(ypred)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">confusionMatrix</span>(ypred, test2<span class="sc">$</span>Classification)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+             Reference
+Prediction    Caras Economicas Intermedias
+  Caras         105          0          19
+  Economicas      8        137          49
+  Intermedias    42         13          66
+
+Overall Statistics
+                                          
+               Accuracy : 0.7016          
+                 95% CI : (0.6564, 0.7441)
+    No Information Rate : 0.3531          
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+                                          
+                  Kappa : 0.5514          
+                                          
+ Mcnemar's Test P-Value : 3.476e-08       
+
+Statistics by Class:
+
+                     Class: Caras Class: Economicas Class: Intermedias
+Sensitivity                0.6774            0.9133             0.4925
+Specificity                0.9331            0.8028             0.8197
+Pos Pred Value             0.8468            0.7062             0.5455
+Neg Pred Value             0.8413            0.9469             0.7862
+Prevalence                 0.3531            0.3417             0.3052
+Detection Rate             0.2392            0.3121             0.1503
+Detection Prevalence       0.2825            0.4419             0.2756
+Balanced Accuracy          0.8053            0.8581             0.6561</code></pre>
+</div>
 </div>
 </section>
 
