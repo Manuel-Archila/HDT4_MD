@@ -70,9 +70,9 @@
     R2 <- 1 - SSE / TSS
 
 ```
-El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un valor bajo ya que un modelo se considera aceptable si tiene un {R^2} mayor a 0.75.
+El R^2 de las predicciones y los valores reales fue de `r R2` el cual es un valor bajo ya que un modelo se considera aceptable si tiene un R^2 mayor a 0.75.
 
-# 1.4
+# 1.4 Haga al menos 3 modelos más con diferentes profundidades y compare los resultados
 ```{r multiple_trees}
 
     modelo1 <- rpart(SalePrice ~., data = train, maxdepth = 3)
@@ -81,67 +81,33 @@ El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un va
     predicciones <- predict(modelo1, newdata = test)
     SSE <- sum((predicciones - test$SalePrice) ^ 2)
     TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
-    R2 <- 1 - SSE / TSS
-    R2
+    R2m1 <- 1 - SSE / TSS
+    R2m1
 
     modelo2 <- rpart(SalePrice ~., data = train, maxdepth = 10)
-    rpart.plot(modelo1)
+    rpart.plot(modelo2)
 
     predicciones <- predict(modelo2, newdata = test)
     SSE <- sum((predicciones - test$SalePrice) ^ 2)
     TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
-    R2 <- 1 - SSE / TSS
-    R2
+    R2m2 <- 1 - SSE / TSS
+    R2m2
 
     modelo3 <- rpart(SalePrice ~., data = train, maxdepth = 2)
-    rpart.plot(modelo1)
+    rpart.plot(modelo3)
 
     predicciones <- predict(modelo3, newdata = test)
     SSE <- sum((predicciones - test$SalePrice) ^ 2)
     TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
-    R2 <- 1 - SSE / TSS
-    R2
-
-    # ------------------------------
-
-    # learner <- lrn("regr.rpart")
-    # arboles_task <- TaskRegr$new("arboles", backend = train, target = "SalePrice")
-
-    # param_set <- ParamSet$new(list(
-    #   ParamInt$new("maxdepth", lower = 1, upper = 30)
-    # ))
-
-    # control <- ctrl_tune_grid()
-    # resampling <- rsmp("cv", folds = 3)
-
-    # measure <- msr("regr.rmse")
-
-    # set.seed(123)
-    # tuning <- tuneParams(
-    #   learner = learner,
-    #   task = arboles_task,
-    #   resampling = resampling,
-    #   measures = measure,
-    #   par.set = param_set,
-    #   control = control,
-    #   show.info = TRUE
-    # )
-
-    # plot_hyperpar_effect(tuning, partial.dep = TRUE)
-
-    # best_learner <- learner %>>% set_params(tuning$x)
-
-    # best_model <- mlr3::train(best_learner, arboles_task)
-
-    # arboles_test <- TaskRegr$new("arboles_test", data = test, target = "SalePrice")
-    # pred <- predict(best_model, arboles_test)
-    # evaluate(arboles_test$target, pred, msr("regr.rmse"))
-
-    # ------------------------------
+    R2m3 <- 1 - SSE / TSS
+    R2m3
 
 ```
-# 1.5
-El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un valor muy bajo, pero cabe destacar que en la hoja de trabajo anterior el {R^2} fue de 0.7 para el modelo de regresion lineal multivariable, Por lo que el modelo de arboles de regresion no lo hizo mejor que el modelo de regresion lineal multivariable. Y un resultado muy similar al modelo de regresion lineal univariable.
+Vemos que de los 3 nuevos modelos el que mejor R^2 lo tiene el modelo 2 con un R^2 de `r R2m2` con profundidad de 10, pero cabe destacar que el modelo de regresion lineal multivariable tiene un R^2 de 0.7, por lo que el modelo de arboles de regresion no lo hizo mejor que el modelo de regresion lineal multivariable. Además que el de profundidad 5 el de la sección **1.3** tuvo el mismo desempeño. Por lo que consideramos que podemos quedarnos con el modelo de profundidad 5. Esto se puede deber a que al momento de realizar la poda quedan pocos nodos y no se puede tener una profundiad de 10.
+
+
+# 1.5 Compare los resultados con el modelo de regresión lineal de la hoja anterior
+El R^2 de las predicciones y los valores reales fue de `r R2` el cual es un valor muy bajo, pero cabe destacar que en la hoja de trabajo anterior el {R2} fue de 0.7 para el modelo de regresion lineal multivariable, Por lo que el modelo de arboles de regresion no lo hizo mejor que el modelo de regresion lineal multivariable. Y un resultado muy similar al modelo de regresion lineal univariable.
 
 
 # 1.6 Creacion de nueva variable Classification
@@ -152,6 +118,8 @@ El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un va
     df_norm$Classification <- sapply(df_norm$SalePrice, function(x) ifelse(x < q1, "Economicas", ifelse(x < q2, "Intermedias", "Caras")))
     df_norm$Classification <- factor(df_norm$Classification)
 ```
+Para poder crear la nueva variable Classification, primero se obtuvieron los cuartiles de la variable SalePrice , y se crearon 3 categorias, las cuales son Economicas, Intermedias y Caras. Luego se creó una nueva variable Classification, la cual se llenó con la función sapply, la cual recorre cada valor de la variable SalePrice y dependiendo del valor de la variable SalePrice, se le asigna la categoria correspondiente. Por ultimo se convirtió la variable Classification a factor.
+
 
 # 1.7 Creacion de nuevo modelo Arbol de clasificacion
 ```{r new_model}
@@ -186,6 +154,8 @@ El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un va
 
 
 ```
+Debido a que tenemos 3 posibles valores a clasificar, debebos asegurarnos que el modelo tenga sufuciente datos de los 3 valores para poder predecir. Es por ello que estratificcamos la data para poder distribuirla en train y test.
+
 # 1.8 Eficiencia el modelo para predecir la variable Classification
 ```{r predict}
     ypred <- predict(modelo4, newdata = test2)
@@ -194,11 +164,8 @@ El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un va
 
     recall_score <- Recall(test2$Classification, ypred,positive = c("Caras","Intermedias","Economicas"))
 
-    
-    #f1_score <- F1_Score(test2$Classification, ypred,positive = "Caras")
-    #`r f1_score`
 ```
-El modelo tuvo una Recall de `r recall_score`
+El modelo tuvo una Recall de `r recall_score`, lo cual es un valor muy bueno para un modelo de clasificacion. A continuación veremos la matriz de confusion para ver que tan bien se comporta el modelo.
 
 
 # 1.9 Eficiencia a partir de la matriz de confusion
@@ -206,26 +173,29 @@ El modelo tuvo una Recall de `r recall_score`
     confusionMatrix(ypred, test2$Classification)
 
 ```
-
+Como podemos ver en la matriz de confusion el modelo tiene problemas para predecir las casas Intermedias, pero en general el modelo tiene un buen desempeño.
 # 1.10 Entrenar modelo por validacion cruzada
-```{r cross_validation}
-    # model3 <- train(Classification ~ ., data = train2, method = "rpart", trControl = ctrl)
-    # model3 <- train(Classification ~ ., data = train2, method = "rpart", trControl = ctrl)
+```{r cross_validation , warning=FALSE}
+   
+    train_without_pred_variable <- subset(train2, select = -Classification)
+    ct <- trainControl(method = "cv",number=10, verboseIter=T)
+    modelo3 <- caret::train(train_without_pred_variable, train2$Classification, trControl = ct, method="rpart")
 
-    model3 <- train(
-      Classification ~ ., method = "rpart", data = train2, 
-      tuneLength = 20,
-      trControl = trainControl(method = "cv", number = 10)
-      ) 
+    y3pred <- predict(modelo3, newdata = test)
 
-    ypred <- predict(modelo3, newdata = test2)
-    ypred<-apply(ypred, 1, function(x) colnames(ypred)[which.max(x)])
-    ypred <- factor(ypred)
-    confusionMatrix(ypred,test2$Classification)
+    recall_score <- Recall(test2$Classification, y3pred,positive = c("Caras","Intermedias","Economicas"))
 ```
+Luego del Crossvalidation los mejores paramatros para el modelo, permitieron obtener un Recall de `r recall_score`, el cual es igual que el del modelo anterior. Por lo que el primero modelo ya tienen los mejores parametros para predecir la variable Classification.
+
+# 1.10 Eficiencia a partir de la matriz de confusion Cross Validation
+```{r matriz de confusion2}
+    confusionMatrix(y3pred, test2$Classification)
+
+```
+Como podemos ver en la matriz de confusion el modelo tiene problemas para predecir las casas Intermedias, pero en general el modelo tiene un buen desempeño. Es la misma matriz de confusión pues es el mismo modelo.
 
 # 1.11 Creando nuevos modelos cambiando profundidad 
-```{r nuevos_modelos_con_profundidad}
+```{r nuevos_modelos_con_profundidad, message=FALSE, warning=FALSE}
     getParamSet("classif.rpart")
     clasificador <- makeClassifTask(data=train2, target = "Classification")
     tablaParametros<-makeParamSet(makeDiscreteParam("maxdepth",values=1:15))
@@ -263,11 +233,16 @@ El modelo tuvo una Recall de `r recall_score`
     confusionMatrix(results$truth, results$response)
     
 ```
-
-# 1.12 Utilizando Random Forest
+El modelo que muestra un mejor desempeño es el que tiene una profundidad de 5, el cual podemos ver en la grafíca como es el punto más alto de la gráfica y luego baja y se estabilidad el desempeño del modelo.
+# 1.12 Utilizando Random Forest Classification
 ```{r random_forest}
     modeloRF <- randomForest(Classification~.,train2,na.action = na.omit)
     ypred <- predict(modeloRF,newdata = test2)
     ypred <- factor(ypred)
+
+    recall_score <- Recall(test2$Classification, ypred,positive = c("Caras","Intermedias","Economicas"))
+
     confusionMatrix(ypred,test2$Classification)
 ```
+
+El modelo de RandomForest obtuvo un recall de `r recall_score` el cual es el mejor valor que se ha obtenido durante toda la hoja. Esto se puede deber a que cuenta con más arboles para poder predecir la variable Classification.
