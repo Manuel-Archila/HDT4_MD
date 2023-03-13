@@ -4,20 +4,23 @@
 ```
 
 ```{r cargar_librerias, echo=FALSE, message=FALSE, warning=FALSE}
-    library(rpart)
     library(caret)
     library(tree)
     library(mlr)
+    library(mlr3)
+    library(mlr3verse)
     library(rpart)
     library(rpart.plot)
     library(Metrics)
     library(randomForest)
     library(dplyr)
+    library(ParamHelpers)
     library(magrittr)
     library(ggplot2)
+    library(MLmetrics)
 ```
 
-# 1. Lectura Dataset 
+# 1. Lectura Dataset
 ```{r recoleccion_de_data}
     datos <- read.csv("train.csv")
     datos <- datos[ , !(names(datos) %in% c("Id","YrSold","MoSold","GarageYrBlt","MSSubClass","YearBuilt"))]
@@ -38,7 +41,7 @@
     for (i in 1:ncol(df_cualitativas)) {
          df_norm[,i] <- ifelse(is.na(df_norm[,i]), "Desconocido", df_norm[,i])
     }
-    
+
     df_norm <- df_norm %>% mutate_at(colnames(df_cualitativas), function(x) as.factor(x))
 
 ```
@@ -65,65 +68,83 @@
     SSE <- sum((predicciones - test$SalePrice) ^ 2)
     TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
     R2 <- 1 - SSE / TSS
-    R2
-    
+
 ```
+El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un valor bajo ya que un modelo se considera aceptable si tiene un {R^2} mayor a 0.75.
 
-# 1.4 
+# 1.4
 ```{r multiple_trees}
-    #  arboles_params <- makeRegrTask(
-    #      data = train,
-    #      target = "SalePrice"
-    #  )
 
-    # param_grid <- makeParamSet(
-    #      makeDiscreteParam("madeph", values= 1:30)
-    # )
+    modelo1 <- rpart(SalePrice ~., data = train, maxdepth = 3)
+    rpart.plot(modelo1)
 
-    # control_grid <- makeTuneControlGrid()
-    # resample <- makeReampleDesc("CV", iters = 3L)
-    
-    # measure <- acc
+    predicciones <- predict(modelo1, newdata = test)
+    SSE <- sum((predicciones - test$SalePrice) ^ 2)
+    TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
+    R2 <- 1 - SSE / TSS
+    R2
+
+    modelo2 <- rpart(SalePrice ~., data = train, maxdepth = 10)
+    rpart.plot(modelo1)
+
+    predicciones <- predict(modelo2, newdata = test)
+    SSE <- sum((predicciones - test$SalePrice) ^ 2)
+    TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
+    R2 <- 1 - SSE / TSS
+    R2
+
+    modelo3 <- rpart(SalePrice ~., data = train, maxdepth = 2)
+    rpart.plot(modelo1)
+
+    predicciones <- predict(modelo3, newdata = test)
+    SSE <- sum((predicciones - test$SalePrice) ^ 2)
+    TSS <- sum((test$SalePrice - mean(test$SalePrice)) ^ 2)
+    R2 <- 1 - SSE / TSS
+    R2
+
+    # ------------------------------
+
+    # learner <- lrn("regr.rpart")
+    # arboles_task <- TaskRegr$new("arboles", backend = train, target = "SalePrice")
+
+    # param_set <- ParamSet$new(list(
+    #   ParamInt$new("maxdepth", lower = 1, upper = 30)
+    # ))
+
+    # control <- ctrl_tune_grid()
+    # resampling <- rsmp("cv", folds = 3)
+
+    # measure <- msr("regr.rmse")
 
     # set.seed(123)
-    # dt_tuneparam <- tuneParams(learner='classif.rpart', 
-    #     task=arboles_params, 
-    #     resampling = resample,
-    #     measures = measure,
-    #     par.set=param_grid, 
-    #     control=control_grid, 
-    #     show.info = TRUE)
-
-    # result_hyperparam <- generateHyperParsEffectData(dt_tuneparam, partial.dep = TRUE)
-
-    # ggplot(
-    #     data = result_hyperparam$data,
-    #     aes(x = maxdepth, y=acc.test.mean)
-    #      ) + geom_line(color = 'darkblue')
-    
-    # best_parameters <- setHyperPars(
-    #     makeLearner("classif.rpart"), 
-    #     par.vals = dt_tuneparam$x
-    # )
-    
-    # best_model <- train(best_parameters, dt_task)
-
-    # modelo_arbol_test <- makeRegrTask(
-    #     data = test,
-    #     target = "SalePrice"
+    # tuning <- tuneParams(
+    #   learner = learner,
+    #   task = arboles_task,
+    #   resampling = resampling,
+    #   measures = measure,
+    #   par.set = param_set,
+    #   control = control,
+    #   show.info = TRUE
     # )
 
-    # results <- predict(best_model, task = modelo_arbol_test)$data
-    # accuracy(results$truth, results$response)
-    
-    
+    # plot_hyperpar_effect(tuning, partial.dep = TRUE)
+
+    # best_learner <- learner %>>% set_params(tuning$x)
+
+    # best_model <- mlr3::train(best_learner, arboles_task)
+
+    # arboles_test <- TaskRegr$new("arboles_test", data = test, target = "SalePrice")
+    # pred <- predict(best_model, arboles_test)
+    # evaluate(arboles_test$target, pred, msr("regr.rmse"))
+
+    # ------------------------------
+
 ```
 # 1.5
-```{r}
-    
-    
-```
-# 1.6
+El {R^2} de las predicciones y los valores reales fue de `r R2` el cual es un valor muy bajo, pero cabe destacar que en la hoja de trabajo anterior el {R^2} fue de 0.7 para el modelo de regresion lineal multivariable, Por lo que el modelo de arboles de regresion no lo hizo mejor que el modelo de regresion lineal multivariable. Y un resultado muy similar al modelo de regresion lineal univariable.
+
+
+# 1.6 Creacion de nueva variable Classification
 ```{r clasificacion}
     salePrices <- df_norm$SalePrice
     q1 <- quantile(df_norm$SalePrice, 0.33)
@@ -132,19 +153,121 @@
     df_norm$Classification <- factor(df_norm$Classification)
 ```
 
-# 1.7
+# 1.7 Creacion de nuevo modelo Arbol de clasificacion
 ```{r new_model}
     df_norm_w_SP <- df_norm[ , !(names(df_norm) %in% c("SalePrice"))]
     df_norm_w_SP <- df_norm_w_SP[ ,c("Classification","Neighborhood","OverallQual","LotFrontage","MSZoning") ]
+    
+    baratas <- df_norm_w_SP[df_norm_w_SP$Classification == "Economicas",]
+    intermedias <- df_norm_w_SP[df_norm_w_SP$Classification == "Intermedias",]
+    caras <- df_norm_w_SP[df_norm_w_SP$Classification == "Caras",]
 
-    corte <- sample(nrow(df_norm_w_SP),nrow(df_norm_w_SP)*porcentaje)
-    train2<-df_norm_w_SP[corte,]
-    test2<-df_norm_w_SP[-corte,]
-    modelo4<- rpart(Classification~.,train2[],method = "class",maxdepth=3)
+    n_baratas <- nrow(baratas)
+    n_intermedias <- nrow(intermedias)
+    n_caras <- nrow(caras)
+
+    n_train_baratas <- round(n_baratas * 0.7)
+    n_train_intermedias <- round(n_intermedias * 0.7)
+    n_train_caras <- round(n_caras * 0.7)
+
+    # Muestrear el 70% de cada conjunto de casas de forma aleatoria
+    train_baratas <- baratas[sample(n_baratas, n_train_baratas), ]
+    train_intermedias <- intermedias[sample(n_intermedias, n_train_intermedias), ]
+    train_caras <- caras[sample(n_caras, n_train_caras), ]
+
+    # Combinar los conjuntos de entrenamiento
+    train2 <- rbind(train_baratas, train_intermedias, train_caras)
+
+    # Obtener los conjuntos de prueba como los elementos restantes
+    test2 <- df_norm_w_SP[!rownames(df_norm_w_SP) %in% rownames(train), ]
+    
+    modelo4<- rpart(Classification~.,train2,method = "class",maxdepth=4)
     rpart.plot(modelo4)
 
+
+```
+# 1.8 Eficiencia el modelo para predecir la variable Classification
+```{r predict}
     ypred <- predict(modelo4, newdata = test2)
     ypred<-apply(ypred, 1, function(x) colnames(ypred)[which.max(x)])
     ypred <- factor(ypred)
+
+    recall_score <- Recall(test2$Classification, ypred,positive = c("Caras","Intermedias","Economicas"))
+
+    
+    #f1_score <- F1_Score(test2$Classification, ypred,positive = "Caras")
+    #`r f1_score`
+```
+El modelo tuvo una Recall de `r recall_score`
+
+
+# 1.9 Eficiencia a partir de la matriz de confusion
+```{r matriz de confusion}
     confusionMatrix(ypred, test2$Classification)
+
+```
+
+# 1.10 Entrenar modelo por validacion cruzada
+```{r cross_validation}
+    # model3 <- train(Classification ~ ., data = train2, method = "rpart", trControl = ctrl)
+    # model3 <- train(Classification ~ ., data = train2, method = "rpart", trControl = ctrl)
+
+    model3 <- train(
+      Classification ~ ., method = "rpart", data = train2, 
+      tuneLength = 20,
+      trControl = trainControl(method = "cv", number = 10)
+      ) 
+
+    ypred <- predict(modelo3, newdata = test2)
+    ypred<-apply(ypred, 1, function(x) colnames(ypred)[which.max(x)])
+    ypred <- factor(ypred)
+    confusionMatrix(ypred,test2$Classification)
+```
+
+# 1.11 Creando nuevos modelos cambiando profundidad 
+```{r nuevos_modelos_con_profundidad}
+    getParamSet("classif.rpart")
+    clasificador <- makeClassifTask(data=train2, target = "Classification")
+    tablaParametros<-makeParamSet(makeDiscreteParam("maxdepth",values=1:15))
+    controlGrid <- makeTuneControlGrid()
+    cv <- makeResampleDesc("CV",iters=3L)
+    metrica <- acc
+    set.seed(456)
+    dt_tuneparam <- tuneParams(learner = "classif.rpart",
+      task = clasificador,
+      resampling = cv,
+      measures = metrica,
+      par.set=tablaParametros,
+      control=controlGrid,
+      show.info=T)
+    result_hyperparam <- generateHyperParsEffectData(dt_tuneparam, partial.dep = TRUE)
+
+    ggplot(
+    data = result_hyperparam$data,
+    aes(x = maxdepth, y=acc.test.mean)
+    ) + geom_line(color = 'darkblue')
+
+    best_parameters = setHyperPars(
+    makeLearner("classif.rpart"), 
+    par.vals = dt_tuneparam$x
+    )
+
+    best_model = train(best_parameters, clasificador)
+    # test <- df_norm[-rownames(train),]
+
+    d.tree.mlr.test <- makeClassifTask(
+      data=test2, 
+      target="Classification"
+    )
+    results <- predict(best_model, task = d.tree.mlr.test)$data
+    confusionMatrix(results$truth, results$response)
+    
+```
+
+# 1.12 Utilizando Random Forest
+```{r random_forest}
+    modeloRF <- randomForest(Classification~.,train2,na.action = na.omit)
+    ypred <- predict(modeloRF,newdata = test2)
+    ypred <- factor(ypred)
+    confusionMatrix(ypred,test2$Classification)
 ```
