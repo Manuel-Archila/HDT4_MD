@@ -185,7 +185,7 @@ Como podemos ver en la matriz de confusion el modelo tiene problemas para predec
 
     recall_score <- Recall(test2$Classification, y3pred,positive = c("Caras","Intermedias","Economicas"))
 ```
-Luego del Crossvalidation los mejores paramatros para el modelo, permitieron obtener un Recall de `r recall_score`, el cual es igual que el del modelo anterior. Por lo que el primero modelo ya tienen los mejores parametros para predecir la variable Classification.
+Luego del Crossvalidation podemos ver que el modelo tiene un buen desempeño con los valores del test, teniendo un Recall de `r recall_score`.
 
 # 1.10 Eficiencia a partir de la matriz de confusion Cross Validation
 ```{r matriz de confusion2}
@@ -234,6 +234,7 @@ Como podemos ver en la matriz de confusion el modelo tiene problemas para predec
     
 ```
 El modelo que muestra un mejor desempeño es el que tiene una profundidad de 5, el cual podemos ver en la grafíca como es el punto más alto de la gráfica y luego baja y se estabilidad el desempeño del modelo.
+
 # 1.12 Utilizando Random Forest Classification
 ```{r random_forest}
     modeloRF <- randomForest(Classification~.,train2,na.action = na.omit)
@@ -243,6 +244,64 @@ El modelo que muestra un mejor desempeño es el que tiene una profundidad de 5, 
     recall_score <- Recall(test2$Classification, ypred,positive = c("Caras","Intermedias","Economicas"))
 
     confusionMatrix(ypred,test2$Classification)
+
 ```
 
 El modelo de RandomForest obtuvo un recall de `r recall_score` el cual es el mejor valor que se ha obtenido durante toda la hoja. Esto se puede deber a que cuenta con más arboles para poder predecir la variable Classification.
+
+
+# 1.12.2 Utilizando Random Forest Classification con Cross Validation
+```{r random_forest_cross_validation}
+
+    train_without_pred_variable <- subset(train2, select = -Classification)
+    ct <- trainControl(method = "cv",number=10, verboseIter=T)
+    modeloRF <- caret::train(train_without_pred_variable, train2$Classification, trControl = ct, method="rf")
+
+    y3pred <- predict(modeloRF, newdata = test)
+
+    recall_score <- Recall(test2$Classification, y3pred,positive = c("Caras","Intermedias","Economicas"))
+
+    confusionMatrix(y3pred,test2$Classification)
+
+```
+Cross validation nos muestra que el modelo tiene un buen desempeño con los valores del test, teniendo un Recall de `r recall_score`. con una cantidad de 76 arboles.
+
+# 1.12.3 Tuneo de parametros para Random Forest
+```{r tuneo_parametros_random_forest, warning=FALSE, message=FALSE}
+    getParamSet("classif.randomForest")
+    clasificador <- makeClassifTask(data=train2, target = "Classification")
+    tablaParametros<-makeParamSet(makeDiscreteParam("ntree",values=1:100))
+    controlGrid <- makeTuneControlGrid()
+    cv <- makeResampleDesc("CV",iters=3L)
+    metrica <- acc
+    set.seed(456)
+    dt_tuneparam <- tuneParams(learner = "classif.randomForest",
+      task = clasificador,
+      resampling = cv,
+      measures = metrica,
+      par.set=tablaParametros,
+      control=controlGrid,
+      show.info=T)
+    result_hyperparam <- generateHyperParsEffectData(dt_tuneparam, partial.dep = TRUE)
+
+    ggplot(
+    data = result_hyperparam$data,
+    aes(x = ntree, y=acc.test.mean)
+    ) + geom_line(color = 'darkblue')
+
+    best_parameters = setHyperPars(
+    makeLearner("classif.randomForest"), 
+    par.vals = dt_tuneparam$x
+    )
+
+    best_model = train(best_parameters, clasificador)
+
+    d.tree.mlr.test <- makeClassifTask(
+      data=test2, 
+      target="Classification"
+    )
+    results <- predict(best_model, task = d.tree.mlr.test)$data
+    confusionMatrix(results$truth, results$response)
+    
+```
+Como podemos ver en la grafica la mejor cantidad de arboles es 75-76, pues son los que presentan el mejor desempeño.

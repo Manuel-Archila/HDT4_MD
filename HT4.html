@@ -348,7 +348,7 @@ Fitting cp = 0.0312 on full training set</code></pre>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    recall_score <span class="ot">&lt;-</span> <span class="fu">Recall</span>(test2<span class="sc">$</span>Classification, y3pred,<span class="at">positive =</span> <span class="fu">c</span>(<span class="st">"Caras"</span>,<span class="st">"Intermedias"</span>,<span class="st">"Economicas"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Luego del Crossvalidation los mejores paramatros para el modelo, permitieron obtener un Recall de 0.8289474, el cual es igual que el del modelo anterior. Por lo que el primero modelo ya tienen los mejores parametros para predecir la variable Classification.</p>
+<p>Luego del Crossvalidation podemos ver que el modelo tiene un buen desempeño con los valores del test, teniendo un Recall de 0.8289474.</p>
 </section>
 <section id="eficiencia-a-partir-de-la-matriz-de-confusion-cross-validation" class="level1">
 <h1>1.10 Eficiencia a partir de la matriz de confusion Cross Validation</h1>
@@ -475,7 +475,10 @@ Detection Prevalence       0.3462            0.3189             0.3349
 Balanced Accuracy          0.8394            0.8357             0.7225</code></pre>
 </div>
 </div>
-<p>El modelo que muestra un mejor desempeño es el que tiene una profundidad de 5, el cual podemos ver en la grafíca como es el punto más alto de la gráfica y luego baja y se estabilidad el desempeño del modelo. # 1.12 Utilizando Random Forest Classification</p>
+<p>El modelo que muestra un mejor desempeño es el que tiene una profundidad de 5, el cual podemos ver en la grafíca como es el punto más alto de la gráfica y luego baja y se estabilidad el desempeño del modelo.</p>
+</section>
+<section id="utilizando-random-forest-classification" class="level1">
+<h1>1.12 Utilizando Random Forest Classification</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>    modeloRF <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(Classification<span class="sc">~</span>.,train2,<span class="at">na.action =</span> na.omit)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    ypred <span class="ot">&lt;-</span> <span class="fu">predict</span>(modeloRF,<span class="at">newdata =</span> test2)</span>
@@ -518,6 +521,211 @@ Balanced Accuracy          0.9197            0.8979             0.8092</code></p
 </div>
 </div>
 <p>El modelo de RandomForest obtuvo un recall de 0.8881579 el cual es el mejor valor que se ha obtenido durante toda la hoja. Esto se puede deber a que cuenta con más arboles para poder predecir la variable Classification.</p>
+</section>
+<section id="utilizando-random-forest-classification-con-cross-validation" class="level1">
+<h1>1.12.2 Utilizando Random Forest Classification con Cross Validation</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>    train_without_pred_variable <span class="ot">&lt;-</span> <span class="fu">subset</span>(train2, <span class="at">select =</span> <span class="sc">-</span>Classification)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    ct <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>,<span class="at">number=</span><span class="dv">10</span>, <span class="at">verboseIter=</span>T)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    modeloRF <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">train</span>(train_without_pred_variable, train2<span class="sc">$</span>Classification, <span class="at">trControl =</span> ct, <span class="at">method=</span><span class="st">"rf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>+ Fold01: mtry=2 
+- Fold01: mtry=2 
++ Fold01: mtry=3 
+- Fold01: mtry=3 
++ Fold01: mtry=4 
+- Fold01: mtry=4 
++ Fold02: mtry=2 
+- Fold02: mtry=2 
++ Fold02: mtry=3 
+- Fold02: mtry=3 
++ Fold02: mtry=4 
+- Fold02: mtry=4 
++ Fold03: mtry=2 
+- Fold03: mtry=2 
++ Fold03: mtry=3 
+- Fold03: mtry=3 
++ Fold03: mtry=4 
+- Fold03: mtry=4 
++ Fold04: mtry=2 
+- Fold04: mtry=2 
++ Fold04: mtry=3 
+- Fold04: mtry=3 
++ Fold04: mtry=4 
+- Fold04: mtry=4 
++ Fold05: mtry=2 
+- Fold05: mtry=2 
++ Fold05: mtry=3 
+- Fold05: mtry=3 
++ Fold05: mtry=4 
+- Fold05: mtry=4 
++ Fold06: mtry=2 
+- Fold06: mtry=2 
++ Fold06: mtry=3 
+- Fold06: mtry=3 
++ Fold06: mtry=4 
+- Fold06: mtry=4 
++ Fold07: mtry=2 
+- Fold07: mtry=2 
++ Fold07: mtry=3 
+- Fold07: mtry=3 
++ Fold07: mtry=4 
+- Fold07: mtry=4 
++ Fold08: mtry=2 
+- Fold08: mtry=2 
++ Fold08: mtry=3 
+- Fold08: mtry=3 
++ Fold08: mtry=4 
+- Fold08: mtry=4 
++ Fold09: mtry=2 
+- Fold09: mtry=2 
++ Fold09: mtry=3 
+- Fold09: mtry=3 
++ Fold09: mtry=4 
+- Fold09: mtry=4 
++ Fold10: mtry=2 
+- Fold10: mtry=2 
++ Fold10: mtry=3 
+- Fold10: mtry=3 
++ Fold10: mtry=4 
+- Fold10: mtry=4 
+Aggregating results
+Selecting tuning parameters
+Fitting mtry = 2 on full training set</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>    y3pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(modeloRF, <span class="at">newdata =</span> test)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    recall_score <span class="ot">&lt;-</span> <span class="fu">Recall</span>(test2<span class="sc">$</span>Classification, y3pred,<span class="at">positive =</span> <span class="fu">c</span>(<span class="st">"Caras"</span>,<span class="st">"Intermedias"</span>,<span class="st">"Economicas"</span>))</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">confusionMatrix</span>(y3pred,test2<span class="sc">$</span>Classification)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+             Reference
+Prediction    Caras Economicas Intermedias
+  Caras         135          0          14
+  Economicas      2        127          28
+  Intermedias    15         13         105
+
+Overall Statistics
+                                         
+               Accuracy : 0.836          
+                 95% CI : (0.798, 0.8694)
+    No Information Rate : 0.3462         
+    P-Value [Acc &gt; NIR] : &lt; 2e-16        
+                                         
+                  Kappa : 0.7541         
+                                         
+ Mcnemar's Test P-Value : 0.05699        
+
+Statistics by Class:
+
+                     Class: Caras Class: Economicas Class: Intermedias
+Sensitivity                0.8882            0.9071             0.7143
+Specificity                0.9512            0.8997             0.9041
+Pos Pred Value             0.9060            0.8089             0.7895
+Neg Pred Value             0.9414            0.9539             0.8627
+Prevalence                 0.3462            0.3189             0.3349
+Detection Rate             0.3075            0.2893             0.2392
+Detection Prevalence       0.3394            0.3576             0.3030
+Balanced Accuracy          0.9197            0.9034             0.8092</code></pre>
+</div>
+</div>
+<p>Cross validation nos muestra que el modelo tiene un buen desempeño con los valores del test, teniendo un Recall de 0.8881579. con una cantidad de 76 arboles.</p>
+</section>
+<section id="tuneo-de-parametros-para-random-forest" class="level1">
+<h1>1.12.3 Tuneo de parametros para Random Forest</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">getParamSet</span>(<span class="st">"classif.randomForest"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     Type  len   Def   Constr Req Tunable Trafo
+ntree             integer    -   500 1 to Inf   -    TRUE     -
+mtry              integer    -     - 1 to Inf   -    TRUE     -
+replace           logical    -  TRUE        -   -    TRUE     -
+classwt     numericvector &lt;NA&gt;     - 0 to Inf   -    TRUE     -
+cutoff      numericvector &lt;NA&gt;     -   0 to 1   -    TRUE     -
+strata            untyped    -     -        -   -   FALSE     -
+sampsize    integervector &lt;NA&gt;     - 1 to Inf   -    TRUE     -
+nodesize          integer    -     1 1 to Inf   -    TRUE     -
+maxnodes          integer    -     - 1 to Inf   -    TRUE     -
+importance        logical    - FALSE        -   -    TRUE     -
+localImp          logical    - FALSE        -   -    TRUE     -
+proximity         logical    - FALSE        -   -   FALSE     -
+oob.prox          logical    -     -        -   Y   FALSE     -
+norm.votes        logical    -  TRUE        -   -   FALSE     -
+do.trace          logical    - FALSE        -   -   FALSE     -
+keep.forest       logical    -  TRUE        -   -   FALSE     -
+keep.inbag        logical    - FALSE        -   -   FALSE     -</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>    clasificador <span class="ot">&lt;-</span> <span class="fu">makeClassifTask</span>(<span class="at">data=</span>train2, <span class="at">target =</span> <span class="st">"Classification"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    tablaParametros<span class="ot">&lt;-</span><span class="fu">makeParamSet</span>(<span class="fu">makeDiscreteParam</span>(<span class="st">"ntree"</span>,<span class="at">values=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>))</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    controlGrid <span class="ot">&lt;-</span> <span class="fu">makeTuneControlGrid</span>()</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    cv <span class="ot">&lt;-</span> <span class="fu">makeResampleDesc</span>(<span class="st">"CV"</span>,<span class="at">iters=</span>3L)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    metrica <span class="ot">&lt;-</span> acc</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set.seed</span>(<span class="dv">456</span>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    dt_tuneparam <span class="ot">&lt;-</span> <span class="fu">tuneParams</span>(<span class="at">learner =</span> <span class="st">"classif.randomForest"</span>,</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">task =</span> clasificador,</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">resampling =</span> cv,</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">measures =</span> metrica,</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">par.set=</span>tablaParametros,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">control=</span>controlGrid,</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.info=</span>T)</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    result_hyperparam <span class="ot">&lt;-</span> <span class="fu">generateHyperParsEffectData</span>(dt_tuneparam, <span class="at">partial.dep =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> result_hyperparam<span class="sc">$</span>data,</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> ntree, <span class="at">y=</span>acc.test.mean)</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">'darkblue'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="HT4_files/figure-html/tuneo_parametros_random_forest-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>    best_parameters <span class="ot">=</span> <span class="fu">setHyperPars</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">makeLearner</span>(<span class="st">"classif.randomForest"</span>), </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">par.vals =</span> dt_tuneparam<span class="sc">$</span>x</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    best_model <span class="ot">=</span> <span class="fu">train</span>(best_parameters, clasificador)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    d.tree.mlr.test <span class="ot">&lt;-</span> <span class="fu">makeClassifTask</span>(</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">data=</span>test2, </span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">target=</span><span class="st">"Classification"</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    results <span class="ot">&lt;-</span> <span class="fu">predict</span>(best_model, <span class="at">task =</span> d.tree.mlr.test)<span class="sc">$</span>data</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">confusionMatrix</span>(results<span class="sc">$</span>truth, results<span class="sc">$</span>response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+             Reference
+Prediction    Caras Economicas Intermedias
+  Caras         136          2          14
+  Economicas      0        125          15
+  Intermedias    16         29         102
+
+Overall Statistics
+                                          
+               Accuracy : 0.8269          
+                 95% CI : (0.7882, 0.8611)
+    No Information Rate : 0.3554          
+    P-Value [Acc &gt; NIR] : &lt; 2e-16         
+                                          
+                  Kappa : 0.7404          
+                                          
+ Mcnemar's Test P-Value : 0.08626         
+
+Statistics by Class:
+
+                     Class: Caras Class: Economicas Class: Intermedias
+Sensitivity                0.8947            0.8013             0.7786
+Specificity                0.9443            0.9470             0.8539
+Pos Pred Value             0.8947            0.8929             0.6939
+Neg Pred Value             0.9443            0.8963             0.9007
+Prevalence                 0.3462            0.3554             0.2984
+Detection Rate             0.3098            0.2847             0.2323
+Detection Prevalence       0.3462            0.3189             0.3349
+Balanced Accuracy          0.9195            0.8741             0.8163</code></pre>
+</div>
+</div>
+<p>Como podemos ver en la grafica la mejor cantidad de arboles es 75-76, pues son los que presentan el mejor desempeño.</p>
 </section>
 
 </main>
