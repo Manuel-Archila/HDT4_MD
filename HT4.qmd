@@ -187,7 +187,7 @@ Como podemos ver en la matriz de confusion el modelo tiene problemas para predec
 ```
 Luego del Crossvalidation podemos ver que el modelo tiene un buen desempeño con los valores del test, teniendo un Recall de `r recall_score`.
 
-# 1.10 Eficiencia a partir de la matriz de confusion Cross Validation
+# 1.10.1 Eficiencia a partir de la matriz de confusion Cross Validation
 ```{r matriz de confusion2}
     confusionMatrix(y3pred, test2$Classification)
 
